@@ -40,9 +40,14 @@ async function getPersonInfo() {
   resultDom.innerHTML += `<img src="images/search.gif" class="offset-5 my-5">`;
 
   //writing url for edge cases and defining url according to documentation
-  if (searchValue.length < 1 || searchValue.length > 10) {
-    alert("Please enter names by the rule");
-    return;
+  if (searchValue[0]==='') {
+    alert("Please enter atleast one name");
+    window.location.reload();
+
+  } else if(searchValue.length > 10) {
+    alert("Please Don't enter more than 10 names");
+    window.location.reload();
+
   } else {
     for (let i = 0; i < searchValue.length; i++) {
       url += `name[]=${searchValue[i]}&`;
@@ -55,11 +60,14 @@ async function getPersonInfo() {
 
   //DOM manipulation after fetching api
   resultDom.innerHTML = `
+  <div class="d-flex col-sm-6 col-lg-4 offset-sm-3 offset-lg-4 mt-5">
+    <input class="form-control me-2 fw-bold" type="search" placeholder="Search in results" aria-label="Search" id="search--value">
+    <button class="btn btn-outline-light" type="submit" onClick="searchResult()">Search</button>
+  </div>
+
   <div class="my-5" id="result-view">
-  
-  <div id="search-results" class="card--group"></div>
-  
-  <button class="btn btn-primary col-6 offset-3 my-4" onClick="window.location.reload();"">Search another name</button>
+    <div id="search-results" class="card--group"></div>
+    <button class="btn btn-primary col-6 offset-3 my-4" onClick="window.location.reload();"">Search another name</button>
   </div>
   `;
 
@@ -67,24 +75,79 @@ async function getPersonInfo() {
   const cards = document.getElementById("search-results");
 
   for (let i = 0; i < data.length; i++) {
+
+  //displaying card of person with two possible countries
+  if (data[i].country[1]) {
     cards.innerHTML += `
+    <div class="card card-props">
+      <div class="card-header font--weight text-center text-dark card-head">
+        <b class="personName">${data[i].name}</b>
+      </div>
+      <div class="card-body">
+        <div class="card-text">Hmmm.. There is a probability of <b>${(data[i].country[0].probability * 100).toFixed(2)}%</b> 
+        that <b>${data[i].name}</b> is from <b>${countryName(data[i].country[0].country_id)}</b> 
+        and <b>${(data[i].country[1].probability * 100).toFixed(2)}%</b> that <b>${data[i].name}</b> 
+        is from <b>${countryName(data[i].country[1].country_id)}</b> 
+      </div>
+    </div> 
+    </div>`;
+
+  //displaying card of person with only one possible country
+  } else if(data[i].country[0]) {
+    cards.innerHTML += `
+    <div class="card card-props">
+      <div class="card-header font--weight text-center text-dark card-head">
+        <b class="personName">${data[i].name}</b>
+      </div>
+      <div class="card-body">
+        <div class="card-text">Hmmm.. There is a probability of <b>${(data[i].country[0].probability * 100).toFixed(2)}%</b> 
+        that <b>${data[i].name}</b> is from <b>${countryName(data[i].country[0].country_id)}</b>
+      </div>
+    </div> 
+    </div>`;  
+
+    //displaying no result found svg in case a random input is provided
+    } else {
+      cards.innerHTML += `
       <div class="card card-props">
-        <div class="card-header font--weight text-center text-dark">
-          <b class="personName" id="personName-${i}">${searchValue[i]}</b>
+        <div class="card-header font--weight text-center text-dark card-head">
+          <b class="personName">${searchValue[i]}</b>
         </div>
         <div class="card-body">
-          <div class="card-text">Hmmm.. There is a probability of <b>${(data[i].country[0].probability * 100).toFixed(2)}%</b> 
-          that <b>${data[i].name}</b> is from a country with a country code <b>${data[i].country[0].country_id}</b> 
-          and <b>${(data[i].country[1].probability * 100).toFixed(2)}%</b> that <b>${data[i].name}</b> 
-          is from a country with a country code <b>${data[i].country[1].country_id}</b>
+          <iframe src="https://embed.lottiefiles.com/animation/108538"></iframe>
         </div>
       </div> 
       </div>`;
-  } 
+    }
+  }
+}
+
+//function for displaying search results
+function searchResult() {
+  const searchInput = document.getElementById('search--value').value.toUpperCase();
+  const allResultCards = document.querySelectorAll('.card-props');
+  const allCardNames = document.querySelectorAll('.card-props .personName');
+  const allCardHeader = document.querySelectorAll('.card-props .card-head');
+
+  for(let i=0; i<allResultCards.length; i++) {
+    if(searchInput==='') {
+      allCardHeader[i].style.backgroundColor = "";
+      allResultCards[i].style.display = ''
+
+    } else if(allCardNames[i].innerText.toUpperCase().includes(searchInput)) {
+      allResultCards[i].style.display = ''
+      allCardHeader[i].style.backgroundColor = "#ff922b";
+    }
+    
+    else {
+      allResultCards[i].style.display = 'none'
+      allCardHeader[i].style.backgroundColor = "";
+    }
+  }
 }
 
 //displaying a warning on website visit to enter proper names by the way mentioned
-alert("Please note that the names that are not in our Database are not visible");
+alert("Please note that the names that are not in our Database will not be visible");
 
 //finally appending the wrapper and container elements that holds every element
 document.body.append(wrapper);
