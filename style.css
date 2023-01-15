@@ -1,0 +1,44 @@
+/* removing initial bydefault padding and margins */
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+/* background color of page */
+body {
+  background-color: #343a40;
+}
+
+.wrapper {
+  min-height: 100%;
+  min-width: 100%;
+}
+
+/* defining height of container element */
+.container-props {
+  height: 100vh;
+}
+
+/* utility class for font weight according to requirement */
+.font--weight {
+  font-weight: 400;
+}
+
+/* card properties to make them responsive */
+#search-results {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.card-props {
+  width: 18rem;
+  margin: 1rem auto;
+}
+
+/* utility for small fonts */
+.small--font {
+  font-size: small;
+}
